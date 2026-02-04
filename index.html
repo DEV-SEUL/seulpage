@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ENGYU</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="home-main">
+      <div class="home-box">
+        <div class="home-box-left">
+          <button class="logo" id="logoBtn" aria-label="홈으로 이동">
+            <img
+              src="image/logo.png"
+              class="logo-image"
+              width="70"
+              height="50"
+              loading="lazy"
+            />
+          </button>
+          <ul class="left-menu" role="menu">
+            <li role="menuitem" tabindex="0" data-page="profile">PROFILE</li>
+            <li role="menuitem" tabindex="0" data-page="notice">NOTICE</li>
+            <li role="menuitem" tabindex="0" data-page="gallery">GALLERY</li>
+            <li role="menuitem" tabindex="0" data-page="backup">BACKUP</li>
+            <li role="menuitem" tabindex="0" data-page="memo">MEMO</li>
+          </ul>
+
+          <!-- 추가: 설정 / 글쓰기 아이콘 -->
+          <div class="left-actions" role="toolbar" aria-label="도구">
+            <button
+              class="icon-btn"
+              id="settingsBtn"
+              type="button"
+              aria-label="설정"
+            >
+              <!-- 기본 SVG(대체 가능) -->
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7zm7.43-2.5a7.72 7.72 0 0 0 .06-1 7.72 7.72 0 0 0-.06-1l2.11-1.65a.5.5 0 0 0 .12-.64l-2-3.46a.5.5 0 0 0-.6-.22l-2.49 1A8.12 8.12 0 0 0 14.9 3.6L14.5 1.2a.5.5 0 0 0-.5-.4h-4a.5.5 0 0 0-.5.4L8 3.6a8.12 8.12 0 0 0-1.07 1.01l-2.49-1a.5.5 0 0 0-.6.22l-2 3.46a.5.5 0 0 0 .12.64L4.57 11c-.04.33-.07.66-.07 1s.03.67.07 1L2.46 14.65a.5.5 0 0 0-.12.64l2 3.46c.13.22.4.31.6.22l2.49-1c.33.3.69.56 1.07.8l.9 2.4c.09.25.32.4.57.4h4c.25 0 .48-.15.57-.4l.9-2.4c.38-.24.74-.5 1.07-.8l2.49 1c.2.08.47 0 .6-.22l2-3.46a.5.5 0 0 0-.12-.64L19.43 13z"
+                />
+              </svg>
+            </button>
+
+            <button
+              class="icon-btn"
+              id="writeBtn"
+              type="button"
+              aria-label="글쓰기"
+            >
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+              >
+                <path
+                  d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"
+                />
+              </svg>
+            </button>
+          </div>
+
+          <iframe
+            id="backgroundMusic"
+            width="0"
+            height="0"
+            style="display: none"
+            frameborder="0"
+            allow="autoplay"
+          ></iframe>
+        </div>
+
+        <div class="home-box-right">
+          <div class="right-post">
+            <!-- 기본 홈 콘텐츠 -->
+            <div class="default-content page-content show">
+              <div class="character-container">
+                <img
+                  src="image/main_image.png"
+                  alt="Character"
+                  class="character-image"
+                  loading="lazy"
+                />
+              </div>
+            </div>
+
+            <!-- PROFILE 페이지 -->
+            <div class="page-content" data-content="profile">
+              <h2 class="page-title">PROFILE</h2>
+              <p class="page-desc">프로필 페이지입니다.</p>
+            </div>
+
+            <!-- NOTICE 페이지 -->
+            <div class="page-content" data-content="notice">
+              <h2 class="page-title">NOTICE</h2>
+              <p class="page-desc">공지사항 페이지입니다.</p>
+            </div>
+
+            <!-- GALLERY 페이지 -->
+            <div class="page-content" data-content="gallery">
+              <h2 class="page-title">GALLERY</h2>
+              <p class="page-desc">갤러리 페이지입니다.</p>
+            </div>
+
+            <!-- DIARY 페이지 -->
+            <div class="page-content" data-content="backup">
+              <h2 class="page-title">BACKUP</h2>
+              <p class="page-desc">백업(저장된 항목) 목록입니다.</p>
+              <div id="backupList" class="diary-list"></div>
+            </div>
+
+            <!-- MEMO 페이지 -->
+            <div class="page-content" data-content="memo">
+              <h2 class="page-title">MEMO</h2>
+              <p class="page-desc">메모 페이지입니다.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 통합: 프래그먼트 로드 후 앱 초기화
+      async function initApp() {
+        const leftMenu = document.querySelector(".left-menu");
+        const pageContents = document.querySelectorAll(".page-content");
+        const logoBtn = document.getElementById("logoBtn");
+        const backgroundMusic = document.getElementById("backgroundMusic");
+        const defaultContent = document.querySelector(".default-content");
+        const videoId = "hO43q71zFyM";
+        let isPlaying = false;
+
+        function hideAllContents() {
+          pageContents.forEach((c) => c.classList.remove("show"));
+        }
+        function clearActiveMenu() {
+          if (!leftMenu) return;
+          leftMenu
+            .querySelectorAll("li")
+            .forEach((li) => li.classList.remove("active"));
+        }
+
+        function showPage(pageName) {
+          hideAllContents();
+          clearActiveMenu();
+
+          if (pageName === "home") {
+            if (defaultContent) defaultContent.classList.add("show");
+            return;
+          }
+
+          const targetPage = document.querySelector(
+            `[data-content="${pageName}"]`
+          );
+          if (targetPage) targetPage.classList.add("show");
+
+          const targetMenu =
+            leftMenu && leftMenu.querySelector(`[data-page="${pageName}"]`);
+          if (targetMenu) targetMenu.classList.add("active");
+        }
+
+        // 백업 목록 렌더링 (backupEntries 키 사용, 기존 diaryEntries도 지원)
+        function renderBackup() {
+          const entries = JSON.parse(
+            localStorage.getItem("backupEntries") ||
+              localStorage.getItem("diaryEntries") ||
+              "[]"
+          );
+          const container = document.getElementById("backupList");
+          if (!container) return;
+          if (!entries.length) {
+            container.innerHTML =
+              '<p class="empty">저장된 항목이 없습니다.</p>';
+            return;
+          }
+          container.innerHTML = entries
+            .map(
+              (e) => `
+            <article class="backup-entry" data-id="${e.id}">
+              <h3>${e.title}</h3>
+              <div class="diary-meta">${new Date(
+                e.created
+              ).toLocaleString()} · ${(e.tags || []).join(", ")}</div>
+              <div class="diary-body">${e.content}</div>
+            </article>
+          `
+            )
+            .join("");
+        }
+
+        // 클릭 이벤트 위임
+        if (leftMenu) {
+          leftMenu.addEventListener("click", (e) => {
+            const li = e.target.closest("li");
+            if (!li) return;
+            showPage(li.dataset.page);
+          });
+
+          // 키보드(Enter / Space) 지원
+          leftMenu.addEventListener("keydown", (e) => {
+            if (e.key !== "Enter" && e.key !== " ") return;
+            const li = e.target.closest("li");
+            if (!li) return;
+            e.preventDefault();
+            showPage(li.dataset.page);
+          });
+        }
+
+        if (logoBtn) logoBtn.addEventListener("click", () => showPage("home"));
+
+        // 왼쪽 액션 버튼: 설정 / 글쓰기로 이동
+        const settingsBtn = document.getElementById("settingsBtn");
+        const writeBtn = document.getElementById("writeBtn");
+
+        if (settingsBtn) {
+          settingsBtn.addEventListener("click", () => {
+            // 설정 관리자 페이지로 이동
+            window.location.href = "admin.html";
+          });
+        }
+
+        if (writeBtn) {
+          writeBtn.addEventListener("click", () => {
+            // 글쓰기(편집) 페이지로 이동 (파일명 필요 시 변경)
+            window.location.href = "write.html";
+          });
+        }
+
+        // 배경음악 토글
+        function toggleMusic() {
+          if (!backgroundMusic) return;
+          if (!isPlaying) {
+            backgroundMusic.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}`;
+            isPlaying = true;
+          } else {
+            backgroundMusic.src = "";
+            isPlaying = false;
+          }
+        }
+
+        // 초기 상태: URL 해시 우선 (index.html#backup 등)
+        const initialPage =
+          location.hash && location.hash.length > 1
+            ? location.hash.substring(1)
+            : "home";
+        showPage(initialPage);
+
+        // 백업 목록 렌더
+        renderBackup();
+
+        // 외부 접근
+        window.toggleMusic = toggleMusic;
+      }
+
+      (async function loadLeftFragmentsAndInit() {
+        async function loadFragment(selector, url) {
+          try {
+            const res = await fetch(url, { cache: "no-cache" });
+            if (!res.ok) {
+              console.warn("Fragment not loaded:", url, res.status);
+              return false;
+            }
+            const html = await res.text();
+            const container = document.querySelector(selector);
+            if (container) {
+              container.innerHTML = html;
+              return true;
+            }
+          } catch (e) {
+            console.error("Error loading fragment:", url, e);
+          }
+          return false;
+        }
+
+        const profileLoaded = await loadFragment(
+          ".page-content[data-content='profile']",
+          "fragments/profile.html"
+        );
+        const noticeLoaded = await loadFragment(
+          ".page-content[data-content='notice']",
+          "fragments/notice.html"
+        );
+        const galleryLoaded = await loadFragment(
+          ".page-content[data-content='gallery']",
+          "fragments/gallery.html"
+        );
+        const diaryLoaded = await loadFragment(
+          ".page-content[data-content='backup']",
+          "fragments/backup.html"
+        );
+        const memoLoaded = await loadFragment(
+          ".page-content[data-content='memo']",
+          "fragments/memo.html"
+        );
+
+        // 모든 프래그먼트 로드 후 앱 초기화
+        initApp();
+      })();
+    </script>
+  </body>
+</html>
