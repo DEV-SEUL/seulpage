@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>[##_page_title_##]</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body id="[##_body_id_##]">
+<s_t3>
+    <div class="home-main">
+        <div class="home-box">
+            <aside class="home-box-left">
+                <div class="logo" onclick="showPage('home')">
+                    <img src="./images/logo.png" class="logo-image" alt="LOGO">
+                </div>
+                <ul class="left-menu">
+                    <li data-page="home" class="active">HOME</li>
+                    <li data-page="profile">PROFILE</li>
+                    <li data-page="notice">NOTICE</li>
+                    <li data-page="gallery">GALLERY</li>
+                </ul>
+                <button class="dark-toggle" onclick="toggleDark()">🌙</button>
+            </aside>
+
+            <main class="home-box-right">
+                <div class="scroll-area">
+                    <section class="page-content show" data-content="home">
+                        <div class="character-wrap">
+                            <div id="speech-bubble" class="speech-bubble">깍각!</div>
+                            <img src="./images/main_image.png" class="character-image" onclick="kakakEffect()" alt="Main Character">
+                        </div>
+                    </section>
+
+                    <section class="page-content" data-content="profile">
+                        <div class="page-inner">
+                            <s_page_rep>
+                                [##_article_rep_desc_##]
+                            </s_page_rep>
+                        </div>
+                    </section>
+
+                    <section class="page-content" data-content="notice">
+                        <div class="notice-fixed">
+                            <s_notice_rep>
+                                <div class="notice-item">
+                                    <a href="[##_notice_rep_link_##]">📌 [##_notice_rep_title_##]</a>
+                                </div>
+                            </s_notice_rep>
+                        </div>
+                        <div class="post-list">
+                            <s_article_rep>
+                                <s_index_article_rep>
+                                    <article class="post-item" data-category="[##_article_rep_category_##]">
+                                        <a href="[##_article_rep_link_##]">
+                                            <h3>[##_article_rep_title_##]</h3>
+                                            <p class="meta">[##_article_rep_date_##]</p>
+                                        </a>
+                                    </article>
+                                </s_index_article_rep>
+                            </s_article_rep>
+                        </div>
+                    </section>
+
+                    <section class="page-content" data-content="gallery">
+                        <div class="gallery-grid">
+                            <s_article_rep>
+                                <s_index_article_rep>
+                                    <div class="gallery-item" data-category="[##_article_rep_category_##]">
+                                        <a href="[##_article_rep_link_##]">
+                                            <img src="[##_article_rep_thumbnail_url_##]" alt="thumb" />
+                                        </a>
+                                    </div>
+                                </s_index_article_rep>
+                            </s_article_rep>
+                        </div>
+                    </section>
+                </div>
+            </main>
+        </div>
+    </div>
+</s_t3>
+<script>
+    // 1. 페이지 전환 함수
+    function showPage(page){
+        document.querySelectorAll(".page-content").forEach(p => p.classList.remove("show"));
+        document.querySelectorAll(".left-menu li").forEach(m => m.classList.remove("active"));
+
+        const target = document.querySelector(`[data-content="${page}"]`);
+        if(target) target.classList.add("show");
+
+        const menu = document.querySelector(`[data-page="${page}"]`);
+        if(menu) menu.classList.add("active");
+    }
+
+    // 2. 다크모드 토글
+    function toggleDark(){
+        document.body.classList.toggle("dark");
+        localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+    }
+
+    // 3. [에러 해결] 클릭 말풍선 효과 (kakakEffect)
+    function kakakEffect() {
+        const bubble = document.getElementById('speech-bubble');
+        if (!bubble) return; // 요소가 없으면 리턴
+
+        const msgs = ["사랑해", "반가워!", "어서와!", "멋져!", "눌렀어?"];
+        bubble.innerText = msgs[Math.floor(Math.random() * msgs.length)];
+        
+        bubble.classList.add('active');
+        
+        // 1.5초 뒤에 사라짐
+        setTimeout(() => { 
+            bubble.classList.remove('active'); 
+        }, 1500);
+    }
+
+    // 4. 초기화 로직
+    document.addEventListener("DOMContentLoaded", function() {
+        // 메뉴 클릭 이벤트 리스너 등록
+        document.querySelectorAll(".left-menu li").forEach(item => {
+            item.addEventListener("click", function(){
+                showPage(this.dataset.page);
+            });
+        });
+
+        // 다크모드 유지 확인
+        if(localStorage.getItem("darkMode") === "true"){
+            document.body.classList.add("dark");
+        }
+    });
+</script>
+</body>
+</html>
+</body>
+</html>
