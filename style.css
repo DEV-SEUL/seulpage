@@ -3,66 +3,176 @@
     --dark-bg: #1a1a1a; --dark-card: #2a2a2a; --dark-text: #e0e0e0; --dark-muted: #999;
 }
 
-/* 1. 기본 레이아웃 */
+/* 1. 기본 레이아웃 (중앙 정렬) */
 body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; }
-body { font-family: 'Inter', sans-serif; background: var(--bg); display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+body {
+    font-family: 'Inter', sans-serif; background: var(--bg);
+    display: flex; align-items: center; justify-content: center; transition: 0.3s;
+}
 body.dark { background: var(--dark-bg); color: var(--dark-text); }
 
-.home-box { display: flex; width: 90vw; max-width: 1000px; height: 600px; background: var(--card); border-radius: 30px; box-shadow: 0 30px 80px rgba(0,0,0,0.1); overflow: hidden; position: relative; }
+.home-main { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
+
+.home-box {
+    display: flex; width: 90vw; max-width: 1000px; height: 600px;
+    background: var(--card); border-radius: 30px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.1); overflow: hidden; position: relative;
+}
 body.dark .home-box { background: var(--dark-card); }
 
-/* 2. 좌측 사이드바 & 메뉴 최적화 */
-.home-box-left { width: 220px; background: var(--card); border-right: 1px solid #f0f0f0; padding: 40px 0; display: flex; flex-direction: column; align-items: center; z-index: 10; }
+/* 2. 좌측 사이드바 */
+.home-box-left {
+    width: 220px; background: var(--card); border-right: 1px solid #f0f0f0;
+    padding: 40px 0; display: flex; flex-direction: column; align-items: center; z-index: 10;
+}
 body.dark .home-box-left { background: #333; border-right: 1px solid #444; }
 
 .logo-image { width: 120px; height: auto; margin-bottom: 20px; cursor: pointer; }
-
-.left-menu { list-style: none; width: 100%; padding: 0; margin-top: 20px; }
-.left-menu li { width: 100%; text-align: center; transition: 0.3s; }
-.left-menu li a { display: block; padding: 15px; text-decoration: none; color: var(--muted); font-weight: 600; font-size: 0.85rem; letter-spacing: 1px; transition: 0.3s; }
-.left-menu li.active a, .left-menu li:hover a { color: var(--accent); }
+.left-menu { list-style: none; width: 100%; padding: 0 20px; margin-top: 20px; }
+.left-menu li { 
+    padding: 15px; text-align: center; cursor: pointer; color: var(--muted); 
+    font-weight: 600; font-size: 0.85rem; letter-spacing: 1px; transition: 0.3s; 
+}
+.left-menu li.active, .left-menu li:hover { color: var(--accent); }
 .dark-toggle { margin-top: auto; padding-bottom: 20px; border: none; background: none; cursor: pointer; font-size: 18px; }
 
 /* 3. 우측 컨텐츠 영역 */
 .home-box-right { flex: 1; padding: 40px; overflow: hidden; display: flex; flex-direction: column; }
-.scroll-area { height: 100%; width: 100%; display: flex; flex-direction: column; overflow-y: auto; scrollbar-width: none; }
+.scroll-area { height: 100%; width: 100%; display: flex; flex-direction: column; }
 .scroll-area::-webkit-scrollbar { display: none; }
 
 .page-content { display: none; width: 100%; height: 100%; }
-.page-content.show { display: flex !important; flex-direction: column; justify-content: flex-start; align-items: center; animation: fadeIn 0.5s ease; }
-.page-content[data-content="home"].show { justify-content: center !important; }
+.page-content.show {
+    display: flex !important; flex-direction: column;
+    justify-content: center !important; align-items: center !important;
+    animation: fadeIn 0.5s ease-in-out;
+}
 
-/* 4. 캐릭터 & 말풍선 */
+/* 4. HOME: 메인 캐릭터 & 말풍선 (크기 최적화) */
 .character-wrap { position: relative; display: flex; justify-content: center; align-items: center; width: 100%; height: 100%; }
-.character-image { max-width: 90%; max-height: 90%; object-fit: contain; cursor: pointer; animation: float 3s ease-in-out infinite; filter: drop-shadow(0 15px 35px rgba(0,0,0,0.08)); transition: 0.2s; }
-.character-image:active { transform: scale(0.95); }
+.character-image {
+    max-width: 90%; max-height: 90%; /* 박스 안에서 꽉 차도록 상향 조정 */
+    object-fit: contain; cursor: pointer;
+    filter: drop-shadow(0 15px 35px rgba(0,0,0,0.08));
+    animation: float 3s ease-in-out infinite;
+    transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.character-image:active { transform: scale(0.9); }
 
-.speech-bubble { position: absolute; top: -50px; background: var(--accent); color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; opacity: 0; transition: 0.3s; pointer-events: none; }
-.speech-bubble.active { opacity: 1; transform: translateY(-5px); }
+.speech-bubble {
+    position: absolute; top: -40px; background: var(--accent); color: white;
+    padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: bold;
+    opacity: 0; transition: 0.3s; pointer-events: none; transform: translateY(10px);
+}
+.speech-bubble.active { opacity: 1; transform: translateY(0); }
 
-/* 5. 갤러리 디자인 (시안 반영) */
-.gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: 100%; }
-.gallery-item { aspect-ratio: 1 / 1; overflow: hidden; background-color: #f0f0f0; cursor: pointer; border-radius: 8px; }
+/* 5. GALLERY: 그리드 및 호버 효과 (중복 제거 통합) */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4열 고정 */
+    gap: 12px;
+    width: 100%;
+}
+
+.gallery-item {
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    border-radius: 8px; /* 부드러운 모서리 추가 */
+}
+
 .img-box { width: 100%; height: 100%; }
 .img-box img { width: 100%; height: 100%; object-fit: cover; transition: 0.4s ease; }
-.img-box:hover img { filter: brightness(1.15) contrast(0.85); opacity: 0.75; transform: scale(1.05); }
 
-/* 6. 라이트박스 */
-.lightbox { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-.lightbox-content { max-width: 85%; max-height: 85%; border-radius: 15px; animation: zoomIn 0.3s ease; }
+/* [시안 반영] 호버 시 하얗게 변하며 살짝 확대 */
+.img-box:hover img {
+    filter: brightness(1.15) contrast(0.85);
+    opacity: 0.75;
+    transform: scale(1.05);
+}
+
+/* 6. LIGHTBOX: 모달 스타일 */
+.lightbox {
+    display: none;
+    position: fixed; z-index: 10000; left: 0; top: 0;
+    width: 100%; height: 100%; background-color: rgba(0,0,0,0.9);
+    justify-content: center; align-items: center;
+    backdrop-filter: blur(5px); /* 배경 블러 추가 */
+}
+
+.lightbox-content {
+    max-width: 85%; max-height: 85%;
+    border-radius: 15px;
+    animation: zoomIn 0.3s ease;
+}
+
 .close-btn { position: absolute; top: 25px; right: 35px; color: #fff; font-size: 40px; cursor: pointer; }
 
-/* 애니메이션 */
+/* 7. 기타 (Notice & Pagination) */
+.notice-item { padding: 15px 10px; font-weight: 600; border-bottom: 1px solid #f0f0f0; transition: 0.2s; }
+.notice-item:hover { background: rgba(0,0,0,0.02); }
+
+.pagination { display: flex; justify-content: center; gap: 15px; padding: 20px 0; }
+.pagination a { text-decoration: none; color: #bbb; font-size: 0.9rem; transition: 0.3s; }
+.pagination a:hover, .pagination .selected { color: var(--text); font-weight: bold; }
+
+/* 애니메이션 정의 */
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 @keyframes zoomIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-/* 반응형 */
+/* 반응형 모바일 */
 @media(max-width:768px){
     .home-box { flex-direction: column; height: auto; width: 95vw; }
-    .home-box-left { width: 100%; padding: 20px 0; border-bottom: 1px solid #f0f0f0; }
-    .left-menu { display: flex; justify-content: center; flex-wrap: wrap; }
-    .left-menu li { width: auto; }
+    .home-box-left { width: 100%; padding: 20px 0; border-right: none; border-bottom: 1px solid #f0f0f0; }
+    .left-menu { display: flex; justify-content: center; flex-wrap: wrap; margin-top: 10px; }
     .home-box-right { height: 450px; padding: 20px; }
-    .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+    .gallery-grid { grid-template-columns: repeat(2, 1fr); } /* 모바일은 2열 */
+}
+
+/* 페이지 이동 애니메이션 보강 */
+.page-content {
+    display: none;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.page-content.show {
+    display: flex !important;
+    flex-direction: column;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 갤러리 그리드 (시안 반영) */
+.gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    width: 100%;
+    padding: 10px;
+}
+
+.gallery-item {
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    border-radius: 8px;
+}
+
+.img-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: 0.4s ease;
+}
+
+.img-box:hover img {
+    filter: brightness(1.2) contrast(0.8);
+    opacity: 0.8;
 }

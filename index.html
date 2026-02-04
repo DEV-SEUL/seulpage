@@ -1,162 +1,330 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline'; frame-src *; style-src * 'unsafe-inline';">
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval'; script-src * 'unsafe-inline' 'unsafe-eval'; connect-src * 'unsafe-inline'; img-src * data: blob: 'unsafe-inline';">
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>[##_page_title_##]</title>
-    
+    <title>HASEL Gallery Optimized</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./style.css">
+    
+    <style>
+        /* --- 변수 설정 --- */
+        :root {
+            --bg: #f4f7f6; --card: #fff; --text: #333; --muted: #777;
+            --active-text: #a0c4e3; 
+            
+            --dark-bg: #1a1a1a; --dark-card: #2a2a2a; --dark-text: #e0e0e0; --dark-muted: #999;
+        }
+        body.dark { 
+            --bg: var(--dark-bg); --card: var(--dark-card); 
+            --text: var(--dark-text); --muted: var(--dark-muted); 
+        }
+
+        /* --- 기본 레이아웃 --- */
+        body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; }
+        body { font-family: 'Segoe UI', 'Inter', sans-serif; background: var(--bg); display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+
+        .home-main { width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; }
+        
+        /* 메인 컨테이너 (사이즈 고정) */
+        .home-box {
+            display: flex; width: 90vw; max-width: 1100px; height: 700px; /* 전체 폭 약간 줄임 */
+            background: var(--card); border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); overflow: hidden; position: relative;
+        }
+
+        /* --- 사이드바 --- */
+        .home-box-left {
+            width: 240px; background: var(--card); border-right: 1px solid #eee;
+            padding: 30px 20px; /* 패딩 축소 */
+            display: flex; flex-direction: column; align-items: center; z-index: 10;
+        }
+        body.dark .home-box-left { border-right: 1px solid #444; }
+
+        .logo { margin-bottom: 30px; }
+        .logo-image { width: 230px; cursor: pointer; transition: 0.3s; } /* 로고 사이즈 미세 조정 */
+
+        .left-menu { list-style: none; padding: 0; width: 100%; }
+        .left-menu li { margin-bottom: 10px; width: 100%; }
+        
+        .left-menu li a {
+            display: block; 
+            padding: 10px 15px; /* 메뉴 패딩 축소 */
+            text-decoration: none;
+            color: var(--muted); 
+            font-weight: 600; 
+            font-size: 0.9rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .left-menu li:hover a {
+            background-color: transparent;
+            color: var(--text);
+            transform: translateX(3px);
+        }
+
+        .left-menu li.active a {
+            background-color: transparent;
+            color: var(--active-text);
+            font-weight: 700;
+        }
+
+        .dark-toggle { margin-top: auto; border: none; background: none; cursor: pointer; font-size: 20px; }
+
+
+        /* --- 우측 콘텐츠 영역 (패딩 축소로 공간 확보) --- */
+        .home-box-right { 
+            flex: 1; 
+            padding: 30px; /* 40px -> 30px 축소 */
+            overflow: hidden; 
+            display: flex; 
+            flex-direction: column; 
+        }
+        .scroll-area { height: 100%; width: 100%; display: flex; flex-direction: column; }
+        
+        .page-content { 
+            display: none; width: 100%; height: 100%; 
+            flex-direction: column; 
+            opacity: 0; transform: translateY(10px); transition: 0.4s ease;
+        }
+        .page-content.show { display: flex; opacity: 1; transform: translateY(0); }
+        
+        .page-content[data-content="home"].show,
+        .page-content[data-content="gallery"].show { 
+            justify-content: center; 
+            align-items: center; 
+        }
+
+        h2 { 
+            color: var(--text); font-size: 16px; /* 폰트 사이즈 줄임 */
+            margin-bottom: 15px; font-weight: bold; width: 100%; text-align: left; 
+            max-width: 640px; /* 그리드 폭과 맞춤 */
+        }
+
+
+        /* --- 갤러리 그리드 (4x3 사이즈 최적화) --- */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px; /* 간격 15px -> 10px 축소 */
+            width: 100%;
+            max-width: 640px; /* 전체 폭 800px -> 640px 축소 (핵심) */
+        }
+
+        .gallery-item {
+            position: relative;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            border-radius: 10px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            background: #eee;
+        }
+
+        .gallery-item img {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: transform 0.4s ease, filter 0.4s ease;
+        }
+
+        .gallery-item:hover img {
+            transform: scale(1.05);
+            filter: brightness(1.15) contrast(0.9);
+        }
+        .gallery-item:hover {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            z-index: 1;
+        }
+
+
+        /* --- 페이지네이션 --- */
+        .pagination { display: flex; justify-content: center; margin-top: 20px; width: 100%; }
+        .pagination a {
+            text-decoration: none; color: #999; padding: 4px 10px; margin: 0 3px;
+            border-radius: 5px; transition: 0.3s; font-size: 13px;
+        }
+        .pagination a.active, .pagination a:hover {
+            background-color: #eee; color: var(--text); font-weight: bold;
+        }
+        body.dark .pagination a.active, body.dark .pagination a:hover {
+            background-color: #444; color: #fff;
+        }
+
+
+        /* --- 라이트박스 --- */
+        .lightbox {
+            display: none; position: fixed; z-index: 1000; top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            justify-content: center; align-items: center;
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        .lightbox.show { display: flex; opacity: 1; }
+
+        .lightbox-content {
+            max-width: 85%; max-height: 85%;
+            border-radius: 12px;
+            box-shadow: 0 5px 30px rgba(0,0,0,0.3);
+            transform: scale(0.9); transition: transform 0.3s ease;
+        }
+        .lightbox.show .lightbox-content { transform: scale(1); }
+
+        .close-btn {
+            position: absolute; top: 20px; right: 30px;
+            color: #fff; font-size: 40px; font-weight: bold;
+            cursor: pointer; transition: 0.3s;
+        }
+        .close-btn:hover { color: #bbb; }
+
+
+        /* 기타 */
+        .character-wrap { position: relative; text-align: center; }
+        .character-image { max-width: 550px; cursor: pointer; animation: float 3s infinite ease-in-out; }
+        .speech-bubble { 
+            position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
+            background: var(--active-text); color: #fff; padding: 8px 16px; border-radius: 20px;
+            opacity: 0; transition: 0.3s; pointer-events: none; font-weight: bold; font-size: 14px;
+        }
+        .speech-bubble.active { opacity: 1; top: -50px; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+    </style>
 </head>
-<body id="[##_body_id_##]">
-<s_t3>
+<body>
+
     <div class="home-main">
         <div class="home-box">
             <aside class="home-box-left">
                 <div class="logo">
-                    <a href="[##_blog_link_##]">
-                        <img src="./images/logo.png" class="logo-image" alt="LOGO">
-                    </a>
+                    <img src="./images/logo.png" class="logo-image" alt="HASEL" onclick="navigateTo('home')" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+                    <h2 style="display:none; cursor:pointer;" onclick="navigateTo('home')">HASEL</h2>
                 </div>
+                
                 <ul class="left-menu">
-                    <li data-page="home"><a href="[##_blog_link_##]">HOME</a></li>
-                    <li data-page="profile"><a href="[##_blog_link_##]/pages/profile">PROFILE</a></li>
-                    <li data-page="notice"><a href="[##_blog_link_##]/category/NOTICE">NOTICE</a></li>
-                    <li data-page="gallery"><a href="[##_blog_link_##]/category/GALLERY">GALLERY</a></li>
+                    <li data-page="home" onclick="navigateTo('home')"><a>HOME</a></li>
+                    <li data-page="profile" onclick="navigateTo('profile')"><a>PROFILE</a></li>
+                    <li data-page="notice" onclick="navigateTo('notice')"><a>NOTICE</a></li>
+                    <li data-page="gallery" onclick="navigateTo('gallery')"><a>GALLERY</a></li>
+                    <li data-page="backup" onclick="navigateTo('backup')"><a>BACKUP</a></li>
+                    <li data-page="memo" onclick="navigateTo('memo')"><a>MEMO</a></li>
                 </ul>
+                
                 <button class="dark-toggle" onclick="toggleDark()">🌙</button>
             </aside>
 
             <main class="home-box-right">
                 <div class="scroll-area">
+                    
                     <section class="page-content" data-content="home">
                         <div class="character-wrap">
-                            <div id="speech-bubble" class="speech-bubble">깍각!</div>
-                            <img src="./images/main_image.png" class="character-image" onclick="kakakEffect()" alt="Main Character">
+                            <div id="speech-bubble" class="speech-bubble">안녕!</div>
+                            <img src="./images/main_image.png" class="character-image" onclick="kakakEffect()" alt="Main" onerror="this.src='https://via.placeholder.com/300x300?text=Character'">
                         </div>
                     </section>
 
                     <section class="page-content" data-content="gallery">
-                        <div class="gallery-grid">
-                            <s_article_rep>
-                                <s_index_article_rep>
-                                    <div class="gallery-item">
-                                        <div class="img-box" onclick="openLightbox('[##_article_rep_thumbnail_url_##]')">
-                                            <s_article_rep_thumbnail>
-                                                <img src="[##_article_rep_thumbnail_url_##]" alt="gallery-thumb">
-                                            </s_article_rep_thumbnail>
-                                            <s_article_rep_thumbnail_not_exists>
-                                                <div class="no-thumb">No Image</div>
-                                            </s_article_rep_thumbnail_not_exists>
-                                        </div>
-                                    </div>
-                                </s_index_article_rep>
-                            </s_article_rep>
-                        </div>
-                        <div class="pagination">
-                            <s_paging>
-                                <s_paging_rep>
-                                    <a [##_paging_rep_link_##] class="num">[##_paging_rep_link_num_##]</a>
-                                </s_paging_rep>
-                            </s_paging>
+                        <div style="width: 100%; max-width: 640px;">
+                            <div class="gallery-grid">
+                                <div class="gallery-item" onclick="openLightbox(this)"><img src="https://picsum.photos/400/400?random=1" data-full="https://picsum.photos/1200/800?random=1"></div>
+                                <div class="gallery-item" onclick="openLightbox(this)"><img src="https://picsum.photos/400/400?random=2" data-full="https://picsum.photos/800/1200?random=2"></div>
+                                <div class="gallery-item" onclick="openLightbox(this)"><img src="https://picsum.photos/400/400?random=3" data-full="https://picsum.photos/1000/1000?random=3"></div>
+                                <div class="gallery-item" onclick="openLightbox(this)"><img src="https://picsum.photos/400/400?random=4" data-full="https://picsum.photos/900/600?random=4"></div>
+                                
+                                <div class="gallery-item" onclick="openLightbox(this)"><img src="https://picsum.photos/400/400?random=5" data-full="https://picsum.photos/600/900?random=5"></div>
+                                <div class="gallery-item" onclick="openLightbox(this)"><img src="https://picsum.photos/400/400?random=6" data-full="https://picsum.photos/800/800?random=6"></div>
+                                <div class="gallery-item" onclick="openLightbox(this)"><img src="https://picsum.photos/400/400?random=7" data-full="https://picsum.photos/1100/700?random=7"></div>
+                                <div class="gallery-item" onclick="openLightbox(this)"><img src="https://picsum.photos/400/400?random=8" data-full="https://picsum.photos/700/1100?random=8"></div>
+                                
+                                <div class="gallery-item" onclick="openLightbox(this)"><img src="https://picsum.photos/400/400?random=9" data-full="https://picsum.photos/800/800?random=9"></div>
+                                <div class="gallery-item" onclick="openLightbox(this)"><img src="https://picsum.photos/400/400?random=10" data-full="https://picsum.photos/800/800?random=10"></div>
+                                <div class="gallery-item" onclick="openLightbox(this)"><img src="https://picsum.photos/400/400?random=11" data-full="https://picsum.photos/800/800?random=11"></div>
+                                <div class="gallery-item" onclick="openLightbox(this)"><img src="https://picsum.photos/400/400?random=12" data-full="https://picsum.photos/800/800?random=12"></div>
+                            </div>
+
+                            <div class="pagination">
+                                <a href="#" class="active">1</a>
+                                <a href="#">2</a>
+                                <a href="#">3</a>
+                                <a href="#">4</a>
+                                <a href="#">5</a>
+                            </div>
                         </div>
                     </section>
 
-                    <section class="page-content" data-content="profile">
-                        <div class="page-inner">
-                            <s_page_rep>
-                                [##_article_rep_desc_##]
-                            </s_page_rep>
-                        </div>
-                    </section>
+                    <section class="page-content" data-content="profile"><h2>PROFILE Page</h2></section>
+                    <section class="page-content" data-content="notice"><h2>NOTICE Page</h2></section>
+                    <section class="page-content" data-content="backup"><h2>BACKUP Page</h2></section>
+                    <section class="page-content" data-content="memo"><h2>MEMO Page</h2></section>
 
-                    <section class="page-content" data-content="notice">
-                        <div class="post-list">
-                            <s_article_rep>
-                                <s_index_article_rep>
-                                    <article class="post-item">
-                                        <a href="[##_article_rep_link_##]">
-                                            <h3>[##_article_rep_title_##]</h3>
-                                            <p class="meta">[##_article_rep_date_##]</p>
-                                        </a>
-                                    </article>
-                                </s_index_article_rep>
-                            </s_article_rep>
-                        </div>
-                    </section>
                 </div>
             </main>
         </div>
     </div>
-</s_t3>
 
-<div id="lightbox-modal" class="lightbox" onclick="closeLightbox()">
-    <span class="close-btn">&times;</span>
-    <img class="lightbox-content" id="lightbox-img">
-</div>
+    <div id="myLightbox" class="lightbox" onclick="closeLightbox(event)">
+        <span class="close-btn">&times;</span>
+        <img class="lightbox-content" id="lightboxImage">
+    </div>
 
-<script>
-    var $j = jQuery.noConflict(); // jQuery 충돌 방지
+    <script>
+        var $j = jQuery.noConflict();
 
-    // 탭 전환 함수
-    function showPage(page){
-        $j(".page-content").removeClass("show");
-        $j(".left-menu li").removeClass("active");
-        
-        var target = $j(`[data-content="${page}"]`);
-        if(target.length) target.addClass("show");
-        $j(`[data-page="${page}"]`).addClass("active");
-    }
-
-    // 캐릭터 클릭 효과 (깍각!)
-    function kakakEffect() {
-        const bubble = document.getElementById('speech-bubble');
-        if(!bubble) return;
-        const msgs = ["사랑해", "반가워!", "어서와!", "멋져!", "눌렀어?"];
-        bubble.innerText = msgs[Math.floor(Math.random() * msgs.length)];
-        bubble.classList.add('active');
-        setTimeout(() => { bubble.classList.remove('active'); }, 1500);
-    }
-
-    // 라이트박스 제어
-    function openLightbox(imgSrc) {
-        if (!imgSrc || imgSrc === "" || imgSrc.includes('[')) return;
-        $j("#lightbox-modal").css("display", "flex");
-        $j("#lightbox-img").attr("src", imgSrc);
-        $j("body").css("overflow", "hidden");
-    }
-
-    function closeLightbox() {
-        $j("#lightbox-modal").hide();
-        $j("body").css("overflow", "auto");
-    }
-
-    // 다크모드
-    function toggleDark(){
-        $j("body").toggleClass("dark");
-        localStorage.setItem("darkMode", $j("body").hasClass("dark"));
-    }
-
-    // 초기 로드 시 URL 경로 분석 및 섹션 자동 활성화
-    $j(document).ready(function() {
-        var path = window.location.pathname;
-        
-        if (path.includes('/category/GALLERY')) {
-            showPage('gallery');
-        } else if (path.includes('/category/NOTICE') || path.includes('/category')) {
-            showPage('notice');
-        } else if (path.includes('/pages/profile')) {
-            showPage('profile');
-        } else {
-            showPage('home');
+        // 페이지 이동
+        function navigateTo(page) {
+            window.location.hash = page;
+            updateContent(page);
         }
 
-        if(localStorage.getItem("darkMode") === "true") {
-            $j("body").addClass("dark");
+        function updateContent(page) {
+            $j(".page-content").removeClass("show");
+            $j(".left-menu li").removeClass("active");
+
+            var target = $j(`[data-content="${page}"]`);
+            if (target.length) {
+                target.addClass("show");
+                target.css('opacity', 0).animate({ opacity: 1 }, 300);
+            }
+            $j(`.left-menu li[data-page="${page}"]`).addClass("active");
         }
-    });
-</script>
+
+        $j(document).ready(function() {
+            var initialPage = window.location.hash.replace('#', '') || 'home';
+            updateContent(initialPage);
+        });
+
+        window.onhashchange = function() {
+            var page = window.location.hash.replace('#', '') || 'home';
+            updateContent(page);
+        };
+
+        // 라이트박스
+        function openLightbox(element) {
+            var lightbox = document.getElementById("myLightbox");
+            var lightboxImg = document.getElementById("lightboxImage");
+            var fullImageSrc = element.querySelector('img').getAttribute('data-full'); 
+
+            lightboxImg.src = fullImageSrc;
+            lightbox.classList.add("show");
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox(event) {
+            if (event.target.id === 'myLightbox' || event.target.className === 'close-btn') {
+                var lightbox = document.getElementById("myLightbox");
+                lightbox.classList.remove("show");
+                document.body.style.overflow = '';
+                setTimeout(function(){ document.getElementById("lightboxImage").src = ""; }, 300);
+            }
+        }
+
+        function kakakEffect() {
+            const bubble = document.getElementById('speech-bubble');
+            bubble.classList.add('active');
+            setTimeout(() => bubble.classList.remove('active'), 1500);
+        }
+        function toggleDark() { $j("body").toggleClass("dark"); }
+    </script>
 </body>
 </html>
